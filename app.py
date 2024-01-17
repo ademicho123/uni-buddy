@@ -1,16 +1,33 @@
-'''
-    Unibuddy is dedicated to providing freshers with essential information about your the school, ensuring he/she navigates campus life with confidence.
-    
-'''
-# Initialize a welcome message
+from flask import Flask, render_template, request
+from chatbot import greeting, response, sent_tokens
 
-print("Welcome to Unibuddy - Your go-to companion for all things related to the school!")
-print("Please enter your credentials to get started!:")
+app = Flask(__name__)
 
-user_name = input("Please enter your name: ")
-user_age = input("Please enter your age: ")
-user_color = input("Please enter your favourite colour: ")
+# Constants
+BOT_NAME = "Unibuddy"
 
-print(f'''
-    Welcome {user_name}!
-    ''')
+@app.route('/')
+def index():
+    return render_template('index.html', bot_name=BOT_NAME)
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    user_message = request.form['user_message'].lower()
+
+    if user_message == 'bye':
+        return f"{BOT_NAME}: Bye! take care.."
+
+    if user_message in ('thanks', 'thank you'):
+        return f"{BOT_NAME}: You are welcome.."
+
+    greeting_response = greeting(user_message)
+    if greeting_response is not None:
+        return f"{BOT_NAME}: {greeting_response}"
+
+    bot_response = response(user_message)
+    sent_tokens.remove(user_message)
+
+    return f"{BOT_NAME}: {bot_response}"
+
+if __name__ == '__main__':
+    app.run(debug=True)

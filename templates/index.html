@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ bot_name }} Chat</title>
+    <style>
+        #chat-history {
+            height: 200px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        #chat-form {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ bot_name }} Chat</h1>
+    
+    <div id="chat-container">
+        <div id="chat-history"></div>
+        <form id="chat-form" action="/chat" method="post">
+            <input type="text" id="user-message" name="user_message" placeholder="Your message here" autocomplete="off" required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Function to append a message to the chat history
+            function appendMessage(message) {
+                $('#chat-history').append('<p>' + message + '</p>');
+                // Scroll to the bottom of the chat history
+                $('#chat-history').scrollTop($('#chat-history')[0].scrollHeight);
+            }
+
+            // Submit form using AJAX
+            $('#chat-form').submit(function (event) {
+                event.preventDefault();
+
+                var userMessage = $('#user-message').val();
+                appendMessage('You: ' + userMessage);
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/chat',
+                    data: { 'user_message': userMessage },
+                    success: function (response) {
+                        appendMessage('{{ bot_name }}: ' + response);
+                    },
+                    error: function (error) {
+                        console.log('Error:', error);
+                    }
+                });
+
+                // Clear the input field
+                $('#user-message').val('');
+            });
+        });
+    </script>
+</body>
+</html>
