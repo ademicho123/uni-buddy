@@ -52,7 +52,7 @@ def greeting(sentence):
 def response(user_response):
     response=''
     sent_tokens.append(user_response)
-    TfidfVec = TfidfVectorizer(tokenizer=LemNormalize, stop_words='english')
+    TfidfVec = TfidfVectorizer(tokenizer=preprocess_text, stop_words='english')
     tfidf = TfidfVec.fit_transform(sent_tokens)
     vals = cosine_similarity(tfidf[-1], tfidf)
     idx=vals.argsort()[0][-2]
