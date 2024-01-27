@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
-from chatbot import greeting, response, sent_tokens
+from chatbot import chatbot  # Import the chatbot instance from chatbot.py
+from chatterbot.conversation import Statement  # Import Statement for response processing
 
 app = Flask(__name__)
 
@@ -15,19 +16,18 @@ def chat():
     user_message = request.form['user_message'].lower()
 
     if user_message == 'bye':
-        return f"{BOT_NAME}: Bye! take care.."
+        return f"Bye! take care.."
 
     if user_message in ('thanks', 'thank you'):
-        return f"{BOT_NAME}: You are welcome.."
+        return f"You are welcome.."
 
-    greeting_response = greeting(user_message)
-    if greeting_response is not None:
-        return f"{BOT_NAME}: {greeting_response}"
+    response = chatbot.get_response(Statement(text=user_message))
 
-    bot_response = response(user_message)
-    sent_tokens.remove(user_message)
+    # Remove the bot's name from the response
+    response_text = str(response)
+    response_text = response_text.replace(chatbot.name, '').strip()
 
-    return f"{BOT_NAME}: {bot_response}"
+    return f"{response_text}"
 
 if __name__ == '__main__':
     app.run(debug=True)
